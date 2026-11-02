@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSA CRYPTOSYSTEM SIMULATOR</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+  <h1>RSA CRYPTOSYSTEM SIMULATOR</h1>
+  <p>Public-key encryption on ASCII codes: each character becomes its ASCII number, e.g. A = 65, a = 97.</p>
+</header>
+<div id="toast" role="status"></div>
+<main>
+  <section class="card">
+    <h2>Inputs</h2>
+    <div class="grid">
+      <label>Prime p <input id="p" type="number" value="61" min="2"></label>
+      <label>Prime q <input id="q" type="number" value="53" min="2"></label>
+    </div>
+    <label>Public exponent e <small>(leave empty for automatic: 17 when valid)</small>
+      <input id="e" type="number" min="2" placeholder="Auto">
+    </label>
+    <div class="presets" id="presets" aria-label="Common values of e">
+      <button type="button" data-e="">Auto</button>
+      {% for v in [65537, 17, 3, 5, 7, 11] %}<button type="button" data-e="{{ v }}">{{ v }}</button>{% endfor %}
+    </div>
+    <p id="eHint" class="hint" aria-live="polite"></p>
+    <label>Plaintext message <input id="plain" type="text" value="Hello, World!" placeholder="Printable ASCII characters"></label>
+    <div class="btns">
+      <button id="btnKeys" class="primary">Generate RSA Keys</button>
+      <button id="btnRandom">Generate New Keys</button>
+      <button id="btnEnc">Encrypt</button>
+      <button id="btnDec">Decrypt</button>
+      <button id="btnClear" class="ghost">Clear All</button>
+    </div>
+    <p id="error" class="error" hidden></p>
+  </section>
+
+  <section class="card">
+    <h2>Workflow</h2>
+    <ol id="flow">
+      <li data-s="1">Enter primes</li><li data-s="2">Generate keys</li><li data-s="3">Enter plaintext</li><li data-s="4">Characters → ASCII</li>
+      <li data-s="5">Encrypt (public key)</li><li data-s="6">Decrypt (private key)</li><li data-s="7">ASCII → characters</li><li data-s="8">Recovered text</li>
+    </ol>
+    <div class="bar"><span id="progress"></span></div>
+  </section>
+
+  <section class="card" id="keyCard" hidden>
+    <h2>Step 2 · Keys</h2>
+    <div id="keyGrid" class="kv"></div>
+    <p class="math" id="keyMath"></p>
+  </section>
+
+  <section class="card" id="mapCard" hidden>
+    <h2>Step 4 · Characters to ASCII codes</h2>
+    <p class="math">n = p × q, φ(n) = (p−1)(q−1), d·e mod φ(n) = 1</p>
+    <div id="mapOut" class="chips"></div>
+    <p class="math" id="numSeq"></p>
+  </section>
+
+  <section class="card" id="encCard" hidden>
+    <h2>Step 5 · Encryption</h2>
+    <p class="math">C = M<sup>e</sup> mod n &nbsp;·&nbsp; <span id="pubUsed"></span></p>
+    <div class="scroll"><table id="encTable"></table></div>
+    <p class="label">Encrypted sequence <button id="btnCopy" class="small">Copy</button></p>
+    <code id="cipherOut"></code>
+    <p class="status" id="encStatus"></p>
+  </section>
+
+  <section class="card" id="decCard" hidden>
+    <h2>Steps 6–8 · Decryption</h2>
+    <p class="math">M = C<sup>d</sup> mod n &nbsp;·&nbsp; <span id="privUsed"></span></p>
+    <div class="scroll"><table id="decTable"></table></div>
+    <p class="label">Decrypted numbers</p><code id="decNums"></code>
+    <p class="label">Recovered plaintext</p><code id="recovered" class="big"></code>
+    <p class="status" id="decStatus"></p>
+  </section>
+
+  <section class="card">
+    <h2>ASCII reference (printable characters)</h2>
+    <div class="chips">{% for code, ch in ascii_table %}<span class="chip"><b>{{ '␣' if code == 32 else ch }}</b>{{ code }}</span>{% endfor %}</div>
+  </section>
+</main>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
